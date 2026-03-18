@@ -1360,6 +1360,71 @@ input, select, textarea {
     background: var(--bg-dark);
     color: white;
     border-radius: var(--radius);
+}
+
+/* ===== Auth Tabs ===== */
+.auth-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--border);
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 12px 0;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+}
+
+.auth-tab.active {
+    color: var(--primary);
+}
+
+.auth-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--primary);
+}
+
+/* ===== Form Error Messages ===== */
+.form-error {
+    background: #FEF2F2;
+    color: #DC2626;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    margin-bottom: 16px;
+    border: 1px solid #FECACA;
+}
+
+/* ===== User Menu (navbar) ===== */
+.user-menu {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-greeting {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.btn-sm {
+    padding: 6px 14px;
+    font-size: 0.8rem;
+}
     box-shadow: var(--shadow-lg);
     font-size: 0.9rem;
     font-weight: 500;

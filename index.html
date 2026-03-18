@@ -25,9 +25,14 @@
                 <a href="#regions" class="nav-link">Regions</a>
                 <a href="#about" class="nav-link">About</a>
             </div>
-            <div class="nav-actions">
-                <button class="btn btn-outline" onclick="openModal('loginModal')">Sign In</button>
+            <div class="nav-actions" id="navActions">
+                <button class="btn btn-outline" id="signInBtn" onclick="openModal('loginModal')">Sign In</button>
                 <button class="btn btn-primary" onclick="openModal('listModal')">List Your Service</button>
+                <!-- Shown when signed in (hidden by default) -->
+                <div class="user-menu" id="userMenu" style="display:none;">
+                    <span class="user-greeting" id="userGreeting"></span>
+                    <button class="btn btn-outline btn-sm" onclick="handleSignOut()">Sign Out</button>
+                </div>
             </div>
             <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu">
                 <span></span><span></span><span></span>
@@ -343,24 +348,56 @@
         </div>
     </footer>
 
-    <!-- Login Modal -->
+    <!-- Login / Register Modal -->
     <div class="modal-overlay" id="loginModal">
         <div class="modal">
             <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
-            <h2>Welcome Back</h2>
-            <p class="modal-subtitle">Sign in to manage your listings and reviews</p>
-            <form onsubmit="event.preventDefault(); closeModal('loginModal');">
-                <div class="form-group">
-                    <label for="loginEmail">Email Address</label>
-                    <input type="email" id="loginEmail" placeholder="you@example.co.nz" required>
-                </div>
-                <div class="form-group">
-                    <label for="loginPassword">Password</label>
-                    <input type="password" id="loginPassword" placeholder="Your password" required>
-                </div>
-                <button type="submit" class="btn btn-primary btn-full">Sign In</button>
-                <p class="form-footer">Don't have an account? <a href="#" onclick="closeModal('loginModal'); openModal('listModal');">Register here</a></p>
-            </form>
+
+            <!-- Tab bar -->
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tabSignIn" onclick="switchAuthTab('signin')">Sign In</button>
+                <button class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Register</button>
+            </div>
+
+            <!-- Sign In Form -->
+            <div id="authSignIn">
+                <p class="modal-subtitle">Sign in to manage your listings and reviews</p>
+                <form onsubmit="event.preventDefault(); handleSignIn();">
+                    <div class="form-group">
+                        <label for="loginEmail">Email Address</label>
+                        <input type="email" id="loginEmail" placeholder="you@example.co.nz" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="Your password" required>
+                    </div>
+                    <div id="loginError" class="form-error" style="display:none;"></div>
+                    <button type="submit" class="btn btn-primary btn-full" id="loginBtn">Sign In</button>
+                    <p class="form-footer">Don't have an account? <a href="#" onclick="switchAuthTab('register')">Register here</a></p>
+                </form>
+            </div>
+
+            <!-- Register Form -->
+            <div id="authRegister" style="display:none;">
+                <p class="modal-subtitle">Create an account to list your services</p>
+                <form onsubmit="event.preventDefault(); handleRegister();">
+                    <div class="form-group">
+                        <label for="regName">Full Name</label>
+                        <input type="text" id="regName" placeholder="e.g. John Smith" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regEmail">Email Address</label>
+                        <input type="email" id="regEmail" placeholder="you@example.co.nz" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword">Password</label>
+                        <input type="password" id="regPassword" placeholder="Min 6 characters" minlength="6" required>
+                    </div>
+                    <div id="registerError" class="form-error" style="display:none;"></div>
+                    <button type="submit" class="btn btn-primary btn-full" id="registerBtn">Create Account</button>
+                    <p class="form-footer">Already have an account? <a href="#" onclick="switchAuthTab('signin')">Sign in</a></p>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -409,11 +446,26 @@
                         <input type="tel" id="listPhone" placeholder="e.g. 021 123 4567" required>
                     </div>
                 </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="listCity">City / Town</label>
+                        <input type="text" id="listCity" placeholder="e.g. Auckland CBD" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="listWebsite">Website (optional)</label>
+                        <input type="text" id="listWebsite" placeholder="e.g. www.yourbusiness.co.nz">
+                    </div>
+                </div>
                 <div class="form-group">
                     <label for="listDesc">Description</label>
                     <textarea id="listDesc" rows="3" placeholder="Tell clients about your services..." required></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary btn-full">Submit Listing</button>
+                <div class="form-group">
+                    <label for="listServices">Services Offered <span style="font-weight:400;color:#94a3b8">(comma-separated)</span></label>
+                    <input type="text" id="listServices" placeholder="e.g. Emergency Repairs, Hot Water Systems, Drain Clearing">
+                </div>
+                <div id="listError" class="form-error" style="display:none;"></div>
+                <button type="submit" class="btn btn-primary btn-full" id="listSubmitBtn">Submit Listing</button>
                 <p class="form-footer">By submitting, you agree to our <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a>.</p>
             </form>
         </div>
@@ -437,7 +489,10 @@
         </div>
     </div>
 
+    <!-- Supabase JS SDK (v2) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="data.js"></script>
+    <script src="supabase-client.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

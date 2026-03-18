@@ -1,16 +1,20 @@
 // ===== NZ Services Directory — Application Logic =====
+// Supports both Supabase (when configured) and local data.js fallback.
 
 (function () {
     'use strict';
 
     // State
-    let currentType = 'all';
-    let currentCategory = '';
-    let currentRegion = '';
-    let currentSort = 'featured';
-    let searchQuery = '';
-    let displayCount = 9;
-    const PAGE_SIZE = 9;
+    var currentType = 'all';
+    var currentCategory = '';
+    var currentRegion = '';
+    var currentSort = 'featured';
+    var searchQuery = '';
+    var displayCount = 9;
+    var PAGE_SIZE = 9;
+    var totalResults = 0;
+    var cachedListings = []; // for local mode pagination
+    var currentUser = null;
 
     // ===== Initialization =====
     document.addEventListener('DOMContentLoaded', init);
@@ -24,11 +28,136 @@
         initMobileMenu();
         animateCounters();
         initSmoothScroll();
+        initAuth();
     }
+
+    // ===== Auth Initialization =====
+    function initAuth() {
+        if (!isSupabaseConfigured()) return;
+        supabaseOnAuthChange(function (user) {
+            currentUser = user;
+            updateAuthUI(user);
+        });
+    }
+
+    function updateAuthUI(user) {
+        var signInBtn = document.getElementById('signInBtn');
+        var userMenu = document.getElementById('userMenu');
+        var greeting = document.getElementById('userGreeting');
+
+        if (user) {
+            if (signInBtn) signInBtn.style.display = 'none';
+            if (userMenu) {
+                userMenu.style.display = 'flex';
+                var name = (user.user_metadata && user.user_metadata.full_name) || user.email;
+                if (greeting) greeting.textContent = 'Hi, ' + name.split(' ')[0];
+            }
+        } else {
+            if (signInBtn) signInBtn.style.display = '';
+            if (userMenu) userMenu.style.display = 'none';
+        }
+    }
+
+    // ===== Auth Tab Switching =====
+    window.switchAuthTab = function (tab) {
+        var signInDiv = document.getElementById('authSignIn');
+        var registerDiv = document.getElementById('authRegister');
+        var tabSignIn = document.getElementById('tabSignIn');
+        var tabRegister = document.getElementById('tabRegister');
+
+        if (tab === 'register') {
+            signInDiv.style.display = 'none';
+            registerDiv.style.display = '';
+            tabSignIn.classList.remove('active');
+            tabRegister.classList.add('active');
+        } else {
+            signInDiv.style.display = '';
+            registerDiv.style.display = 'none';
+            tabSignIn.classList.add('active');
+            tabRegister.classList.remove('active');
+        }
+        // Clear errors
+        var loginErr = document.getElementById('loginError');
+        var regErr = document.getElementById('registerError');
+        if (loginErr) loginErr.style.display = 'none';
+        if (regErr) regErr.style.display = 'none';
+    };
+
+    // ===== Sign In Handler =====
+    window.handleSignIn = function () {
+        if (!isSupabaseConfigured()) {
+            closeModal('loginModal');
+            showToast('Signed in successfully! (Demo mode)');
+            return;
+        }
+
+        var email = document.getElementById('loginEmail').value.trim();
+        var password = document.getElementById('loginPassword').value;
+        var errEl = document.getElementById('loginError');
+        var btn = document.getElementById('loginBtn');
+
+        btn.disabled = true;
+        btn.textContent = 'Signing in...';
+        errEl.style.display = 'none';
+
+        supabaseSignIn(email, password).then(function () {
+            btn.disabled = false;
+            btn.textContent = 'Sign In';
+            closeModal('loginModal');
+            showToast('Welcome back!');
+        }).catch(function (err) {
+            btn.disabled = false;
+            btn.textContent = 'Sign In';
+            errEl.textContent = err.message || 'Sign in failed. Please try again.';
+            errEl.style.display = 'block';
+        });
+    };
+
+    // ===== Register Handler =====
+    window.handleRegister = function () {
+        if (!isSupabaseConfigured()) {
+            closeModal('loginModal');
+            showToast('Account created! (Demo mode)');
+            return;
+        }
+
+        var name = document.getElementById('regName').value.trim();
+        var email = document.getElementById('regEmail').value.trim();
+        var password = document.getElementById('regPassword').value;
+        var errEl = document.getElementById('registerError');
+        var btn = document.getElementById('registerBtn');
+
+        btn.disabled = true;
+        btn.textContent = 'Creating account...';
+        errEl.style.display = 'none';
+
+        supabaseSignUp(email, password, name).then(function () {
+            btn.disabled = false;
+            btn.textContent = 'Create Account';
+            closeModal('loginModal');
+            showToast('Account created! Check your email to confirm.');
+        }).catch(function (err) {
+            btn.disabled = false;
+            btn.textContent = 'Create Account';
+            errEl.textContent = err.message || 'Registration failed. Please try again.';
+            errEl.style.display = 'block';
+        });
+    };
+
+    // ===== Sign Out Handler =====
+    window.handleSignOut = function () {
+        if (!isSupabaseConfigured()) return;
+        supabaseSignOut().then(function () {
+            currentUser = null;
+            showToast('Signed out.');
+        }).catch(function () {
+            showToast('Error signing out.');
+        });
+    };
 
     // ===== Navbar Scroll Effect =====
     function initNavbar() {
-        const navbar = document.getElementById('navbar');
+        var navbar = document.getElementById('navbar');
         window.addEventListener('scroll', function () {
             navbar.classList.toggle('scrolled', window.scrollY > 20);
         });
@@ -36,12 +165,12 @@
 
     // ===== Mobile Menu =====
     function initMobileMenu() {
-        const btn = document.getElementById('mobileMenuBtn');
-        const navLinks = document.getElementById('navLinks');
+        var btn = document.getElementById('mobileMenuBtn');
+        var navLinks = document.getElementById('navLinks');
 
         btn.addEventListener('click', function () {
             navLinks.classList.toggle('active');
-            const spans = btn.querySelectorAll('span');
+            var spans = btn.querySelectorAll('span');
             if (navLinks.classList.contains('active')) {
                 spans[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
                 spans[1].style.opacity = '0';
@@ -53,11 +182,10 @@
             }
         });
 
-        // Close mobile menu on nav link click
         navLinks.querySelectorAll('.nav-link').forEach(function (link) {
             link.addEventListener('click', function () {
                 navLinks.classList.remove('active');
-                const spans = btn.querySelectorAll('span');
+                var spans = btn.querySelectorAll('span');
                 spans[0].style.transform = '';
                 spans[1].style.opacity = '';
                 spans[2].style.transform = '';
@@ -69,14 +197,13 @@
     function initSmoothScroll() {
         document.querySelectorAll('.nav-link').forEach(function (link) {
             link.addEventListener('click', function (e) {
-                const href = this.getAttribute('href');
+                var href = this.getAttribute('href');
                 if (href && href.startsWith('#')) {
                     e.preventDefault();
-                    const target = document.querySelector(href);
+                    var target = document.querySelector(href);
                     if (target) {
                         target.scrollIntoView({ behavior: 'smooth' });
                     }
-                    // Update active state
                     document.querySelectorAll('.nav-link').forEach(function (l) { l.classList.remove('active'); });
                     this.classList.add('active');
                 }
@@ -86,12 +213,12 @@
 
     // ===== Animated Counters =====
     function animateCounters() {
-        const counters = document.querySelectorAll('.stat-number');
-        const observer = new IntersectionObserver(function (entries) {
+        var counters = document.querySelectorAll('.stat-number');
+        var observer = new IntersectionObserver(function (entries) {
             entries.forEach(function (entry) {
                 if (entry.isIntersecting) {
-                    const el = entry.target;
-                    const target = parseInt(el.getAttribute('data-count'));
+                    var el = entry.target;
+                    var target = parseInt(el.getAttribute('data-count'));
                     animateNumber(el, 0, target, 1500);
                     observer.unobserve(el);
                 }
@@ -102,14 +229,14 @@
     }
 
     function animateNumber(el, start, end, duration) {
-        const range = end - start;
-        const startTime = performance.now();
+        var range = end - start;
+        var startTime = performance.now();
 
         function update(currentTime) {
-            const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
-            const current = Math.floor(start + range * eased);
+            var elapsed = currentTime - startTime;
+            var progress = Math.min(elapsed / duration, 1);
+            var eased = 1 - Math.pow(1 - progress, 3);
+            var current = Math.floor(start + range * eased);
             el.textContent = current.toLocaleString() + (end >= 1000 ? '+' : '');
             if (progress < 1) {
                 requestAnimationFrame(update);
@@ -122,29 +249,66 @@
     function renderCategories(showAll) {
         var grid = document.getElementById('categoriesGrid');
         var cats = showAll ? CATEGORIES : CATEGORIES.slice(0, 12);
-        grid.innerHTML = cats.map(function (cat) {
-            return '<div class="category-card" onclick="filterByCategory(\'' + cat.id + '\')" style="--cat-color:' + cat.color + '">' +
-                '<div class="category-icon" style="background:' + cat.bg + '">' + cat.icon + '</div>' +
-                '<h3>' + escapeHtml(cat.name) + '</h3>' +
-                '<span>' + cat.count + ' providers</span>' +
-            '</div>';
-        }).join('');
+
+        // Try to fetch live counts from Supabase
+        if (isSupabaseConfigured()) {
+            supabaseFetchCategoryCounts().then(function (countMap) {
+                grid.innerHTML = cats.map(function (cat) {
+                    var c = countMap[cat.id] || 0;
+                    return categoryCardHtml(cat, c);
+                }).join('');
+            }).catch(function () {
+                grid.innerHTML = cats.map(function (cat) {
+                    return categoryCardHtml(cat, cat.count);
+                }).join('');
+            });
+        } else {
+            grid.innerHTML = cats.map(function (cat) {
+                return categoryCardHtml(cat, cat.count);
+            }).join('');
+        }
+    }
+
+    function categoryCardHtml(cat, count) {
+        return '<div class="category-card" onclick="filterByCategory(\'' + cat.id + '\')" style="--cat-color:' + cat.color + '">' +
+            '<div class="category-icon" style="background:' + cat.bg + '">' + cat.icon + '</div>' +
+            '<h3>' + escapeHtml(cat.name) + '</h3>' +
+            '<span>' + count + ' providers</span>' +
+        '</div>';
     }
 
     // ===== Render Regions =====
     function renderRegions() {
         var grid = document.getElementById('regionsGrid');
-        grid.innerHTML = REGIONS.map(function (region) {
-            return '<div class="region-card" onclick="filterByRegion(\'' + region.id + '\')">' +
-                '<div class="region-icon">' +
-                    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>' +
-                '</div>' +
-                '<div class="region-info">' +
-                    '<h3>' + escapeHtml(region.name) + '</h3>' +
-                    '<span>' + escapeHtml(region.city) + ' · ' + region.count + ' services</span>' +
-                '</div>' +
-            '</div>';
-        }).join('');
+
+        if (isSupabaseConfigured()) {
+            supabaseFetchRegionCounts().then(function (countMap) {
+                grid.innerHTML = REGIONS.map(function (region) {
+                    var c = countMap[region.id] || 0;
+                    return regionCardHtml(region, c);
+                }).join('');
+            }).catch(function () {
+                grid.innerHTML = REGIONS.map(function (region) {
+                    return regionCardHtml(region, region.count);
+                }).join('');
+            });
+        } else {
+            grid.innerHTML = REGIONS.map(function (region) {
+                return regionCardHtml(region, region.count);
+            }).join('');
+        }
+    }
+
+    function regionCardHtml(region, count) {
+        return '<div class="region-card" onclick="filterByRegion(\'' + region.id + '\')">' +
+            '<div class="region-icon">' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>' +
+            '</div>' +
+            '<div class="region-info">' +
+                '<h3>' + escapeHtml(region.name) + '</h3>' +
+                '<span>' + escapeHtml(region.city) + ' · ' + count + ' services</span>' +
+            '</div>' +
+        '</div>';
     }
 
     // ===== Populate Filter Dropdowns =====
@@ -167,7 +331,7 @@
         });
     }
 
-    // ===== Get Filtered Listings =====
+    // ===== Get Filtered Listings (local fallback) =====
     function getFilteredListings() {
         var results = LISTINGS.filter(function (listing) {
             if (currentType !== 'all' && listing.type !== currentType) return false;
@@ -181,7 +345,6 @@
             return true;
         });
 
-        // Sort
         switch (currentSort) {
             case 'featured':
                 results.sort(function (a, b) { return (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || b.rating - a.rating; });
@@ -203,8 +366,16 @@
         return results;
     }
 
-    // ===== Render Listings =====
+    // ===== Render Listings (supports Supabase async + local fallback) =====
     function renderListings() {
+        if (isSupabaseConfigured()) {
+            renderListingsFromSupabase();
+        } else {
+            renderListingsLocal();
+        }
+    }
+
+    function renderListingsLocal() {
         var grid = document.getElementById('listingsGrid');
         var allResults = getFilteredListings();
         var results = allResults.slice(0, displayCount);
@@ -212,54 +383,93 @@
         var loadMoreContainer = document.getElementById('loadMoreContainer');
 
         countEl.textContent = allResults.length;
+        totalResults = allResults.length;
+        cachedListings = allResults;
 
         if (results.length === 0) {
-            grid.innerHTML = '<div class="no-results">' +
-                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M8 11h6"/></svg>' +
-                '<h3>No services found</h3>' +
-                '<p>Try adjusting your filters or search terms</p>' +
-            '</div>';
+            grid.innerHTML = noResultsHtml();
             loadMoreContainer.style.display = 'none';
             return;
         }
 
         loadMoreContainer.style.display = allResults.length > displayCount ? '' : 'none';
+        grid.innerHTML = results.map(listingCardHtml).join('');
+    }
 
-        grid.innerHTML = results.map(function (listing) {
-            var initials = listing.name.split(' ').slice(0, 2).map(function (w) { return w.charAt(0); }).join('');
-            var color = AVATAR_COLORS[listing.id % AVATAR_COLORS.length];
-            var stars = generateStars(listing.rating);
-            var regionObj = REGIONS.find(function (r) { return r.id === listing.region; });
-            var categoryObj = CATEGORIES.find(function (c) { return c.id === listing.category; });
+    function renderListingsFromSupabase() {
+        var grid = document.getElementById('listingsGrid');
+        var countEl = document.getElementById('resultsCount');
+        var loadMoreContainer = document.getElementById('loadMoreContainer');
 
-            return '<div class="listing-card" onclick="showDetail(' + listing.id + ')">' +
-                '<div class="listing-header">' +
-                    '<div class="listing-avatar" style="background:' + color + '">' + escapeHtml(initials) + '</div>' +
-                    '<div class="listing-info">' +
-                        '<div class="listing-name">' + escapeHtml(listing.name) + '</div>' +
-                        '<div class="listing-category">' + (categoryObj ? escapeHtml(categoryObj.name) : '') + '</div>' +
-                        '<div class="listing-badges">' +
-                            '<span class="badge badge-' + listing.type + '">' + (listing.type === 'independent' ? 'Independent' : 'Agency') + '</span>' +
-                            (listing.verified ? '<span class="badge badge-verified">✓ Verified</span>' : '') +
-                            (listing.featured ? '<span class="badge badge-featured">★ Featured</span>' : '') +
-                        '</div>' +
+        supabaseFetchListings({
+            type: currentType,
+            category: currentCategory,
+            region: currentRegion,
+            search: searchQuery,
+            sort: currentSort,
+            limit: displayCount,
+            offset: 0
+        }).then(function (result) {
+            totalResults = result.total;
+            cachedListings = result.listings;
+            countEl.textContent = result.total;
+
+            if (result.listings.length === 0) {
+                grid.innerHTML = noResultsHtml();
+                loadMoreContainer.style.display = 'none';
+                return;
+            }
+
+            loadMoreContainer.style.display = result.total > displayCount ? '' : 'none';
+            grid.innerHTML = result.listings.map(listingCardHtml).join('');
+        }).catch(function (err) {
+            console.error('Supabase fetch error, falling back to local data:', err);
+            renderListingsLocal();
+        });
+    }
+
+    function noResultsHtml() {
+        return '<div class="no-results">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M8 11h6"/></svg>' +
+            '<h3>No services found</h3>' +
+            '<p>Try adjusting your filters or search terms</p>' +
+        '</div>';
+    }
+
+    function listingCardHtml(listing) {
+        var initials = listing.name.split(' ').slice(0, 2).map(function (w) { return w.charAt(0); }).join('');
+        var color = AVATAR_COLORS[(typeof listing.id === 'number' ? listing.id : 0) % AVATAR_COLORS.length];
+        var stars = generateStars(listing.rating);
+        var regionObj = REGIONS.find(function (r) { return r.id === listing.region; });
+        var categoryObj = CATEGORIES.find(function (c) { return c.id === listing.category; });
+
+        return '<div class="listing-card" onclick="showDetail(' + listing.id + ')">' +
+            '<div class="listing-header">' +
+                '<div class="listing-avatar" style="background:' + color + '">' + escapeHtml(initials) + '</div>' +
+                '<div class="listing-info">' +
+                    '<div class="listing-name">' + escapeHtml(listing.name) + '</div>' +
+                    '<div class="listing-category">' + (categoryObj ? escapeHtml(categoryObj.name) : '') + '</div>' +
+                    '<div class="listing-badges">' +
+                        '<span class="badge badge-' + listing.type + '">' + (listing.type === 'independent' ? 'Independent' : 'Agency') + '</span>' +
+                        (listing.verified ? '<span class="badge badge-verified">✓ Verified</span>' : '') +
+                        (listing.featured ? '<span class="badge badge-featured">★ Featured</span>' : '') +
                     '</div>' +
                 '</div>' +
-                '<div class="listing-body">' +
-                    '<p class="listing-desc">' + escapeHtml(listing.description) + '</p>' +
-                    '<div class="listing-meta">' +
-                        '<div class="listing-meta-item listing-rating">' + stars + ' <strong>' + listing.rating + '</strong> <span>(' + listing.reviews + ')</span></div>' +
-                    '</div>' +
+            '</div>' +
+            '<div class="listing-body">' +
+                '<p class="listing-desc">' + escapeHtml(listing.description) + '</p>' +
+                '<div class="listing-meta">' +
+                    '<div class="listing-meta-item listing-rating">' + stars + ' <strong>' + listing.rating + '</strong> <span>(' + listing.reviews + ')</span></div>' +
                 '</div>' +
-                '<div class="listing-footer">' +
-                    '<div class="listing-location">' +
-                        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>' +
-                        escapeHtml(listing.city) + ', ' + (regionObj ? escapeHtml(regionObj.name) : '') +
-                    '</div>' +
-                    '<span class="listing-action">View Details →</span>' +
+            '</div>' +
+            '<div class="listing-footer">' +
+                '<div class="listing-location">' +
+                    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>' +
+                    escapeHtml(listing.city) + ', ' + (regionObj ? escapeHtml(regionObj.name) : '') +
                 '</div>' +
-            '</div>';
-        }).join('');
+                '<span class="listing-action">View Details →</span>' +
+            '</div>' +
+        '</div>';
     }
 
     // ===== Star Rating Generator =====
@@ -352,10 +562,23 @@
 
     // ===== Detail Modal =====
     window.showDetail = function (id) {
-        var listing = LISTINGS.find(function (l) { return l.id === id; });
-        if (!listing) return;
+        if (isSupabaseConfigured()) {
+            supabaseFetchListingById(id).then(function (listing) {
+                renderDetail(listing);
+            }).catch(function () {
+                // Fallback: try cached listings, then local LISTINGS
+                var listing = cachedListings.find(function (l) { return l.id === id; })
+                    || LISTINGS.find(function (l) { return l.id === id; });
+                if (listing) renderDetail(listing);
+            });
+        } else {
+            var listing = LISTINGS.find(function (l) { return l.id === id; });
+            if (listing) renderDetail(listing);
+        }
+    };
 
-        var color = AVATAR_COLORS[listing.id % AVATAR_COLORS.length];
+    function renderDetail(listing) {
+        var color = AVATAR_COLORS[(typeof listing.id === 'number' ? listing.id : 0) % AVATAR_COLORS.length];
         var initials = listing.name.split(' ').slice(0, 2).map(function (w) { return w.charAt(0); }).join('');
         var regionObj = REGIONS.find(function (r) { return r.id === listing.region; });
         var categoryObj = CATEGORIES.find(function (c) { return c.id === listing.category; });
@@ -406,7 +629,7 @@
 
         document.getElementById('detailContent').innerHTML = html;
         openModal('detailModal');
-    };
+    }
 
     // ===== Modal Functions =====
     window.openModal = function (id) {
@@ -445,8 +668,55 @@
 
     // ===== List Submission Handler =====
     window.handleListSubmit = function () {
-        closeModal('listModal');
-        showToast('Your listing has been submitted for review! We\'ll be in touch soon.');
+        var listingData = {
+            name: document.getElementById('listName').value.trim(),
+            type: document.getElementById('listType').value,
+            category: document.getElementById('listCategory').value,
+            region: document.getElementById('listRegion').value,
+            email: document.getElementById('listEmail').value.trim(),
+            phone: document.getElementById('listPhone').value.trim(),
+            city: document.getElementById('listCity').value.trim(),
+            website: (document.getElementById('listWebsite').value || '').trim(),
+            description: document.getElementById('listDesc').value.trim(),
+            services: (document.getElementById('listServices').value || '')
+                .split(',')
+                .map(function (s) { return s.trim(); })
+                .filter(function (s) { return s.length > 0; })
+        };
+
+        var errEl = document.getElementById('listError');
+        var btn = document.getElementById('listSubmitBtn');
+
+        if (!isSupabaseConfigured()) {
+            closeModal('listModal');
+            showToast('Your listing has been submitted for review! (Demo mode)');
+            return;
+        }
+
+        // Must be signed in
+        if (!currentUser) {
+            errEl.textContent = 'Please sign in or register before submitting a listing.';
+            errEl.style.display = 'block';
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Submitting...';
+        errEl.style.display = 'none';
+
+        supabaseCreateListing(listingData).then(function () {
+            btn.disabled = false;
+            btn.textContent = 'Submit Listing';
+            closeModal('listModal');
+            showToast('Your listing has been submitted for review! We\'ll be in touch soon.');
+            // Reset form
+            document.querySelector('#listModal form').reset();
+        }).catch(function (err) {
+            btn.disabled = false;
+            btn.textContent = 'Submit Listing';
+            errEl.textContent = err.message || 'Submission failed. Please try again.';
+            errEl.style.display = 'block';
+        });
     };
 
     // ===== Toast Notification =====
