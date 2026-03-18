@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en-NZ">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="New Zealand's premier services directory. Find independent professionals and agencies across all regions of Aotearoa.">
+    <title>NZ Services Directory — Find Professionals Across Aotearoa</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <a href="#" class="logo">
+                <span class="logo-icon">&#9670;</span>
+                <span class="logo-text">NZ<span class="logo-accent">Services</span></span>
+            </a>
+            <div class="nav-links" id="navLinks">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#categories" class="nav-link">Categories</a>
+                <a href="#listings" class="nav-link">Directory</a>
+                <a href="#regions" class="nav-link">Regions</a>
+                <a href="#about" class="nav-link">About</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn btn-outline" onclick="openModal('loginModal')">Sign In</button>
+                <button class="btn btn-primary" onclick="openModal('listModal')">List Your Service</button>
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-bg"></div>
+        <div class="container hero-container">
+            <div class="hero-badge">Trusted by thousands across Aotearoa</div>
+            <h1 class="hero-title">Find Trusted Services<br>Across <span class="gradient-text">New Zealand</span></h1>
+            <p class="hero-subtitle">Connect with independent professionals and agencies in every region. From Auckland to Invercargill — quality services at your fingertips.</p>
+            <div class="hero-search">
+                <div class="search-box">
+                    <div class="search-field">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        <input type="text" id="heroSearch" placeholder="What service are you looking for?" autocomplete="off">
+                    </div>
+                    <div class="search-divider"></div>
+                    <div class="search-field">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <select id="heroRegion">
+                            <option value="">All Regions</option>
+                            <option value="northland">Northland</option>
+                            <option value="auckland">Auckland</option>
+                            <option value="waikato">Waikato</option>
+                            <option value="bay-of-plenty">Bay of Plenty</option>
+                            <option value="gisborne">Gisborne</option>
+                            <option value="hawkes-bay">Hawke's Bay</option>
+                            <option value="taranaki">Taranaki</option>
+                            <option value="manawatu-whanganui">Manawatū-Whanganui</option>
+                            <option value="wellington">Wellington</option>
+                            <option value="nelson-tasman">Nelson-Tasman</option>
+                            <option value="marlborough">Marlborough</option>
+                            <option value="west-coast">West Coast</option>
+                            <option value="canterbury">Canterbury</option>
+                            <option value="otago">Otago</option>
+                            <option value="southland">Southland</option>
+                        </select>
+                    </div>
+                    <button class="search-btn" onclick="performSearch()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        Search
+                    </button>
+                </div>
+            </div>
+            <div class="hero-stats">
+                <div class="stat"><span class="stat-number" data-count="2450">0</span><span class="stat-label">Professionals</span></div>
+                <div class="stat-divider"></div>
+                <div class="stat"><span class="stat-number" data-count="680">0</span><span class="stat-label">Agencies</span></div>
+                <div class="stat-divider"></div>
+                <div class="stat"><span class="stat-number" data-count="15">0</span><span class="stat-label">Regions</span></div>
+                <div class="stat-divider"></div>
+                <div class="stat"><span class="stat-number" data-count="32">0</span><span class="stat-label">Categories</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="section categories-section" id="categories">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Browse by Category</span>
+                <h2 class="section-title">Popular Service Categories</h2>
+                <p class="section-subtitle">Explore our most sought-after service categories across New Zealand</p>
+            </div>
+            <div class="categories-grid" id="categoriesGrid">
+                <!-- Populated by JS -->
+            </div>
+            <div class="text-center mt-2">
+                <button class="btn btn-outline" onclick="showAllCategories()">View All Categories</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Listings Section -->
+    <section class="section listings-section" id="listings">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Featured Professionals</span>
+                <h2 class="section-title">Top-Rated Services</h2>
+                <p class="section-subtitle">Hand-picked professionals and agencies trusted by New Zealanders</p>
+            </div>
+
+            <!-- Filters Bar -->
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <button class="filter-chip active" data-type="all" onclick="filterByType('all', this)">All</button>
+                    <button class="filter-chip" data-type="independent" onclick="filterByType('independent', this)">Independent</button>
+                    <button class="filter-chip" data-type="agency" onclick="filterByType('agency', this)">Agency</button>
+                </div>
+                <div class="filter-group">
+                    <select class="filter-select" id="filterCategory" onchange="applyFilters()">
+                        <option value="">All Categories</option>
+                    </select>
+                    <select class="filter-select" id="filterRegion" onchange="applyFilters()">
+                        <option value="">All Regions</option>
+                    </select>
+                    <select class="filter-select" id="filterSort" onchange="applyFilters()">
+                        <option value="featured">Featured</option>
+                        <option value="rating">Highest Rated</option>
+                        <option value="reviews">Most Reviewed</option>
+                        <option value="name-asc">Name A-Z</option>
+                        <option value="name-desc">Name Z-A</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Results Count -->
+            <div class="results-info" id="resultsInfo">
+                Showing <span id="resultsCount">0</span> services
+            </div>
+
+            <!-- Listings Grid -->
+            <div class="listings-grid" id="listingsGrid">
+                <!-- Populated by JS -->
+            </div>
+
+            <!-- Load More -->
+            <div class="text-center mt-2" id="loadMoreContainer">
+                <button class="btn btn-primary btn-lg" id="loadMoreBtn" onclick="loadMore()">Load More Services</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Regions Section -->
+    <section class="section regions-section" id="regions">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Nationwide Coverage</span>
+                <h2 class="section-title">Services Across All Regions</h2>
+                <p class="section-subtitle">From the Far North to the deep south — we've got Aotearoa covered</p>
+            </div>
+            <div class="regions-grid" id="regionsGrid">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="section how-it-works-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Simple Process</span>
+                <h2 class="section-title">How It Works</h2>
+            </div>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    </div>
+                    <h3>Search</h3>
+                    <p>Browse categories or search for specific services in your region</p>
+                </div>
+                <div class="step-connector">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <h3>Compare</h3>
+                    <p>Review profiles, ratings, and services offered by professionals</p>
+                </div>
+                <div class="step-connector">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    </div>
+                    <h3>Connect</h3>
+                    <p>Get in touch directly and book the right service for your needs</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="section cta-section">
+        <div class="container">
+            <div class="cta-card">
+                <div class="cta-content">
+                    <h2>Are You a Service Provider?</h2>
+                    <p>Join thousands of professionals and agencies listed on NZ's most trusted services directory. Get discovered by clients across Aotearoa.</p>
+                    <div class="cta-features">
+                        <div class="cta-feature">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            Free basic listing
+                        </div>
+                        <div class="cta-feature">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            Reach clients nationwide
+                        </div>
+                        <div class="cta-feature">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            Verified reviews & ratings
+                        </div>
+                    </div>
+                    <button class="btn btn-white btn-lg" onclick="openModal('listModal')">List Your Service — It's Free</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section about-section" id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-content">
+                    <span class="section-badge">About Us</span>
+                    <h2 class="section-title text-left">New Zealand's Trusted Services Directory</h2>
+                    <p>NZ Services Directory is Aotearoa's comprehensive platform connecting Kiwis with trusted professionals and agencies. Whether you need a plumber in Palmerston North, an electrician in Auckland, or a photographer in Queenstown — we make finding the right service simple.</p>
+                    <p>We verify every listing and encourage genuine reviews to ensure you always find quality, reliable services. Our directory covers all 15 regions of New Zealand, supporting both independent operators and established agencies.</p>
+                    <div class="about-values">
+                        <div class="value-item">
+                            <div class="value-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            </div>
+                            <div>
+                                <strong>Verified Listings</strong>
+                                <span>Every service provider is checked</span>
+                            </div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                            </div>
+                            <div>
+                                <strong>Kiwi Owned</strong>
+                                <span>100% New Zealand operated</span>
+                            </div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            </div>
+                            <div>
+                                <strong>Community Driven</strong>
+                                <span>Real reviews from real Kiwis</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image">
+                    <div class="about-img-placeholder">
+                        <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="100" cy="100" r="90" stroke="currentColor" stroke-width="2" opacity="0.2"/>
+                            <path d="M100 30 L120 80 L170 80 L130 110 L145 165 L100 135 L55 165 L70 110 L30 80 L80 80 Z" fill="currentColor" opacity="0.1" stroke="currentColor" stroke-width="1.5"/>
+                            <text x="100" y="195" text-anchor="middle" fill="currentColor" font-size="11" opacity="0.6">Aotearoa New Zealand</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="#" class="logo">
+                        <span class="logo-icon">&#9670;</span>
+                        <span class="logo-text">NZ<span class="logo-accent">Services</span></span>
+                    </a>
+                    <p>Connecting Kiwis with trusted professionals and agencies across Aotearoa New Zealand.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="Facebook">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Instagram">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                        </a>
+                        <a href="#" class="social-link" aria-label="LinkedIn">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Directory</h4>
+                    <a href="#categories">All Categories</a>
+                    <a href="#listings" onclick="setTimeout(function(){filterBySort('featured')},300)">Featured Services</a>
+                    <a href="#regions">Browse by Region</a>
+                    <a href="#listings" onclick="setTimeout(function(){filterBySort('newest')},300)">New Listings</a>
+                    <a href="#listings" onclick="setTimeout(function(){filterBySort('rating')},300)">Top Rated</a>
+                </div>
+                <div class="footer-links">
+                    <h4>For Providers</h4>
+                    <a href="javascript:void(0)" onclick="openModal('listModal')">List Your Service</a>
+                    <a href="advertising.html">Advertising</a>
+                    <a href="premium.html">Premium Plans</a>
+                    <a href="resources.html">Provider Resources</a>
+                    <a href="success.html">Success Stories</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Support</h4>
+                    <a href="help.html">Help Centre</a>
+                    <a href="contact.html">Contact Us</a>
+                    <a href="privacy.html">Privacy Policy</a>
+                    <a href="terms.html">Terms of Service</a>
+                    <a href="report.html">Report a Listing</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 NZ Services Directory. All rights reserved. Made with aroha in Aotearoa.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
+            <h2>Welcome Back</h2>
+            <p class="modal-subtitle">Sign in to manage your listings and reviews</p>
+            <form onsubmit="event.preventDefault(); closeModal('loginModal');">
+                <div class="form-group">
+                    <label for="loginEmail">Email Address</label>
+                    <input type="email" id="loginEmail" placeholder="you@example.co.nz" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" placeholder="Your password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+                <p class="form-footer">Don't have an account? <a href="#" onclick="closeModal('loginModal'); openModal('listModal');">Register here</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- List Service Modal -->
+    <div class="modal-overlay" id="listModal">
+        <div class="modal modal-lg">
+            <button class="modal-close" onclick="closeModal('listModal')">&times;</button>
+            <h2>List Your Service</h2>
+            <p class="modal-subtitle">Join NZ's trusted services directory — it's free to get started</p>
+            <form onsubmit="event.preventDefault(); handleListSubmit();">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="listName">Business / Professional Name</label>
+                        <input type="text" id="listName" placeholder="e.g. Smith Plumbing Ltd" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="listType">Provider Type</label>
+                        <select id="listType" required>
+                            <option value="">Select type</option>
+                            <option value="independent">Independent Professional</option>
+                            <option value="agency">Agency / Company</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="listCategory">Category</label>
+                        <select id="listCategory" required>
+                            <option value="">Select category</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="listRegion">Region</label>
+                        <select id="listRegion" required>
+                            <option value="">Select region</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="listEmail">Email</label>
+                        <input type="email" id="listEmail" placeholder="contact@yourbusiness.co.nz" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="listPhone">Phone</label>
+                        <input type="tel" id="listPhone" placeholder="e.g. 021 123 4567" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="listDesc">Description</label>
+                    <textarea id="listDesc" rows="3" placeholder="Tell clients about your services..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Submit Listing</button>
+                <p class="form-footer">By submitting, you agree to our <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a>.</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Service Detail Modal -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal modal-lg">
+            <button class="modal-close" onclick="closeModal('detailModal')">&times;</button>
+            <div id="detailContent">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <div class="toast-content">
+            <svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span id="toastMessage">Success!</span>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

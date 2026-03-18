@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en-NZ">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Help Centre — NZ Services Directory. Find answers to common questions and get support.">
+    <title>Help Centre — NZ Services Directory</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="pages.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo"><span class="logo-icon">&#9670;</span><span class="logo-text">NZ<span class="logo-accent">Services</span></span></a>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="index.html#categories" class="nav-link">Categories</a>
+                <a href="index.html#listings" class="nav-link">Directory</a>
+                <a href="index.html#regions" class="nav-link">Regions</a>
+                <a href="index.html#about" class="nav-link">About</a>
+            </div>
+            <div class="nav-actions"><a href="index.html" class="btn btn-outline">Back to Directory</a></div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+        </div>
+    </nav>
+
+    <main class="page-content">
+        <div class="container">
+            <div class="page-header">
+                <span class="section-badge">Support</span>
+                <h1 class="page-title">Help Centre</h1>
+                <p class="page-subtitle">Find answers to common questions about using NZ Services Directory</p>
+            </div>
+
+            <!-- Search -->
+            <div class="help-search">
+                <div class="search-box" style="max-width:560px; margin:0 auto;">
+                    <div class="search-field" style="flex:1">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        <input type="text" id="helpSearch" placeholder="Search for help..." oninput="filterFAQ(this.value)">
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-grid">
+                <!-- For Users -->
+                <div class="faq-category">
+                    <h2>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;color:var(--primary)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        Finding Services
+                    </h2>
+                    <div class="faq-item" data-keywords="search find service provider look">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            How do I search for a service?
+                            <span class="faq-toggle">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Use the search bar on the homepage to enter what you're looking for (e.g. "plumber") and optionally select a region. You can also browse by category or region from the main directory page. Use the filter options to narrow results by provider type (Independent or Agency), category, region, and sort order.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item" data-keywords="independent agency difference type">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            What's the difference between Independent and Agency?
+                            <span class="faq-toggle">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p><strong>Independent</strong> providers are sole traders or individual professionals who operate their own business. <strong>Agencies</strong> are companies with multiple staff members or teams. Both are verified and held to the same quality standards on our platform.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item" data-keywords="verified trust check badge">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            What does the "Verified" badge mean?
+                            <span class="faq-toggle">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>The Verified badge indicates that we've confirmed the provider's identity, contact details, and business registration. For trade services, we also check relevant licences and qualifications. This helps you trust that you're dealing with a legitimate business.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item" data-keywords="review rating star feedback">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            How do ratings and reviews work?
+                            <span class="faq-toggle">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Ratings are on a 1–5 star scale based on genuine client reviews. Only users who have contacted a provider through our platform can leave a review. We moderate all reviews to ensure they are honest and follow our guidelines. Providers can respond to reviews publicly.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item" data-keywords="free cost charge pay">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            Is it free to use NZ Services Directory?
+                            <span class="faq-toggle">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Yes! Searching for, browsing, and contacting service providers is completely free for consumers. There is no cost to find and connect with professionals on our platform.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- For Providers -->
+                <div class="faq-category">
+                    <h2>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;color:var(--primary)"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        For Service Providers
+                    </h2>
+                    <div class="faq-item" data-keywords="list add create listing register new service provider">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            How do I list my service?
+                            <span class="faq-toggle">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Click the "List Your Service" button on the homepage. Fill in your business name, type (Independent or Agency), category, region, contact details, and a description of your services. Basic listings are free. After submission, our team will review and publish your listing within 1–2 business days.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item" data-keywords="edit update change listing modify">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            Can I edit my listing after submission?
+                            <span class="faq-toggle">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Yes. Once you have an account, sign in and navigate to your dashboard to edit your listing details, update services, change contact information, or upload new photos. Changes are reviewed before going live.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item" data-keywords="premium plan paid advertising boost featured">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            What are Premium Plans?
+                            <span class="faq-toggle">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Premium Plans give your listing extra visibility. Benefits include a "Featured" badge, priority placement in search results, enhanced profile with photos and videos, and analytics dashboard. Plans start from $29/month. Visit the <a href="premium.html">Premium Plans</a> page for full details.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item" data-keywords="delete remove listing cancel">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            How do I remove my listing?
+                            <span class="faq-toggle">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Sign in to your account and go to your listing settings, where you can deactivate or permanently delete your listing. Alternatively, email us at hello@nzservices.co.nz and we'll process the removal within 1 business day.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account & Safety -->
+                <div class="faq-category">
+                    <h2>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;color:var(--primary)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        Account & Safety
+                    </h2>
+                    <div class="faq-item" data-keywords="report problem listing fake fraud scam">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            How do I report a problematic listing?
+                            <span class="faq-toggle">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Use the <a href="report.html">Report a Listing</a> page to flag any listing that is inaccurate, fraudulent, or violates our terms. Our team investigates all reports within 24 hours. You can also click the report button on any service provider's detail page.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item" data-keywords="password reset forgot login sign in account">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            I forgot my password. How do I reset it?
+                            <span class="faq-toggle">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>On the sign-in page, click "Forgot Password?" and enter your email address. We'll send you a link to create a new password. If you don't receive the email within a few minutes, check your spam folder or contact us.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item" data-keywords="data privacy information personal delete">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            How is my data protected?
+                            <span class="faq-toggle">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>We comply with the New Zealand Privacy Act 2020. Your data is encrypted and stored securely. We never sell personal information. Read our full <a href="privacy.html">Privacy Policy</a> for detailed information on how we handle your data.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-cta">
+                <h2>Still need help?</h2>
+                <p>Our support team is here for you. Get in touch and we'll respond within one business day.</p>
+                <a href="contact.html" class="btn btn-primary btn-lg">Contact Support</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 NZ Services Directory. All rights reserved. Made with aroha in Aotearoa. · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="contact.html">Contact</a></p>
+            </div>
+        </div>
+    </footer>
+    <script src="pages.js"></script>
+</body>
+</html>
