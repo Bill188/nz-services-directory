@@ -2,8 +2,8 @@
 // Configure your Supabase project URL and anon key below.
 // These are safe to expose in client-side code (they are public/anon keys).
 
-const SUPABASE_URL = '';   // e.g. 'https://abcdefghij.supabase.co'
-const SUPABASE_ANON_KEY = ''; // e.g. 'eyJhbGciOiJI...'
+const SUPABASE_URL = 'https://josvgjssrpfrfuygmbum.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impvc3ZnanNzcnBmcmZ1eWdtYnVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4MzcxNjcsImV4cCI6MjA4OTQxMzE2N30.LQ0qk-2fvh3wszTUr9HTK_PfusStDxksmaeLsMxKs_s';
 
 // ===== Client Initialization =====
 let _supabase = null;

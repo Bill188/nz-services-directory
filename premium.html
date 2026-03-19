@@ -102,7 +102,7 @@
                         <li class="not-included">Video profile</li>
                         <li class="not-included">Dedicated account manager</li>
                     </ul>
-                    <button class="btn btn-primary btn-full" onclick="showPageToast('Thanks for your interest! We\'ll email you setup details.')">Get Started</button>
+                    <button class="btn btn-primary btn-full" onclick="startCheckout('professional')">Get Started — $29/mo</button>
                 </div>
 
                 <div class="pricing-card">
@@ -145,7 +145,7 @@
                             Priority support
                         </li>
                     </ul>
-                    <button class="btn btn-outline btn-full" onclick="showPageToast('Our team will be in touch to set up your Business plan!')">Contact Sales</button>
+                    <button class="btn btn-outline btn-full" onclick="startCheckout('business')">Get Started — $79/mo</button>
                 </div>
             </div>
 
@@ -162,6 +162,9 @@
     </footer>
 
     <div class="toast" id="toast"><div class="toast-content"><svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span id="toastMessage">Success!</span></div></div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="supabase-client.js"></script>
+    <script src="stripe-config.js"></script>
     <script src="pages.js"></script>
 </body>
 </html>

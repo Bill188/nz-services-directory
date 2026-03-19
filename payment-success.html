@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en-NZ">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Payment successful — Welcome to your premium plan on NZ Services Directory.">
+    <title>Payment Successful — NZ Services Directory</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="pages.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo"><span class="logo-icon">&#9670;</span><span class="logo-text">NZ<span class="logo-accent">Services</span></span></a>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="index.html#categories" class="nav-link">Categories</a>
+                <a href="index.html#listings" class="nav-link">Directory</a>
+                <a href="index.html#regions" class="nav-link">Regions</a>
+                <a href="index.html#about" class="nav-link">About</a>
+            </div>
+            <div class="nav-actions"><a href="index.html" class="btn btn-outline">Back to Directory</a></div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+        </div>
+    </nav>
+
+    <main class="page-content">
+        <div class="container">
+            <div class="payment-success-card">
+                <div class="success-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                </div>
+                <h1>Payment Successful!</h1>
+                <p class="success-message">Thank you for upgrading your plan. Your premium features are now active.</p>
+
+                <div class="success-details">
+                    <div class="success-detail-item">
+                        <strong>What happens next?</strong>
+                        <ul>
+                            <li>Your listing will be upgraded within a few minutes</li>
+                            <li>You'll receive a confirmation email from Stripe</li>
+                            <li>Premium features (featured badge, priority placement) will appear automatically</li>
+                            <li>You can manage your subscription anytime from your Stripe customer portal</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="success-actions">
+                    <a href="index.html" class="btn btn-primary btn-lg">Return to Directory</a>
+                    <a href="contact.html" class="btn btn-outline btn-lg">Need Help?</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container"><div class="footer-bottom"><p>&copy; 2026 NZ Services Directory. All rights reserved. · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="contact.html">Contact</a></p></div></div>
+    </footer>
+
+    <script src="pages.js"></script>
+</body>
+</html>
